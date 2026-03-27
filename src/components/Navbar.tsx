@@ -1,19 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Sun, Moon, Cog } from 'lucide-react';
+import { Menu, X, Sun, Moon, Cog, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/useLanguage';
+import { Language } from '@/lib/translations';
 
-const navLinks = [
-  { label: 'About', href: '#about' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Skills', href: '#skills' },
-  { label: 'Experience', href: '#experience' },
-  { label: 'Contact', href: '#contact' },
-];
+const langLabels: Record<Language, string> = { en: 'EN', fr: 'FR', ar: 'عر' };
+const langOrder: Language[] = ['en', 'fr', 'ar'];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const { lang, setLang, t } = useLanguage();
+
+  const navLinks = [
+    { label: t('about'), href: '#about' },
+    { label: t('projects'), href: '#projects' },
+    { label: t('skills'), href: '#skills' },
+    { label: t('experience'), href: '#experience' },
+    { label: t('contact'), href: '#contact' },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -24,6 +30,11 @@ export default function Navbar() {
   const toggleTheme = () => {
     setIsDark(!isDark);
     document.documentElement.classList.toggle('light');
+  };
+
+  const cycleLang = () => {
+    const idx = langOrder.indexOf(lang);
+    setLang(langOrder[(idx + 1) % langOrder.length]);
   };
 
   return (
@@ -41,12 +52,18 @@ export default function Navbar() {
                 {l.label}
               </a>
             ))}
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="ml-2 text-muted-foreground hover:text-primary">
+            <Button variant="ghost" size="icon" onClick={cycleLang} className="ml-1 text-muted-foreground hover:text-primary" title="Change language">
+              <span className="text-xs font-bold">{langLabels[lang]}</span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-muted-foreground hover:text-primary">
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
           </div>
 
-          <div className="md:hidden flex items-center gap-2">
+          <div className="md:hidden flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={cycleLang} className="text-muted-foreground">
+              <span className="text-xs font-bold">{langLabels[lang]}</span>
+            </Button>
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-muted-foreground">
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
